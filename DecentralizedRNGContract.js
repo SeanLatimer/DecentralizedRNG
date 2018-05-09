@@ -10,14 +10,12 @@
 
 var DecentralizedRNGContract = function() {
   // Data stored by the smart contract
-  LocalContractStorage.defineMapProperty(this, "hash_to_rng") // Max, Number, Data
+  LocalContractStorage.defineMapProperty(this, "hash_to_rng") // Max, Number, Data, Date
 }
 
 DecentralizedRNGContract.prototype = {
   // init is called once, when the contract is deployed.
-  init: function() {
-    this.rng_count = 1; // The first id should be 1 (not 0)
-  },
+  init: function() { },
 
   requestNumber: function (max, data) {
     if(Blockchain.transaction.value != 0) { // Users only pay the gas fee.
