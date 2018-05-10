@@ -1,6 +1,6 @@
-<!-- 
+<!--
 DecentralizedRNG leverages the blockchain to select a random number.
-When you request a number, you can post any data with the request.  
+When you request a number, you can post any data with the request.
 This way what you are selecting is verifiable as well.
 e.g. If I'm doing a giveaway, post a numbered list with the request so that the list can't be modified after a number was selected.
 
@@ -33,8 +33,8 @@ See also DecentralizedRNGContract.js
 
     <!-- This pulls in the 'Select Wallet File' (incl Password) from Neb's library -->
     <div class=select-wallet-file></div>
-    
-    <br><br>      
+
+    <br><br>
 
     <!-- The Dapp form -->
     max: <input type=number id=new_request_max></input>
@@ -46,8 +46,8 @@ See also DecentralizedRNGContract.js
     <script src=lib/nebulas.js></script>
     <script src=js/1-localSave.js></script>
     <script src=js/i18n.js data-depends=jquery.slim></script>
-    <script src=js/ui-block.js data-depends="bootbox blockies jquery.slim i18n.js nebulas.js"></script> 
-    
+    <script src=js/ui-block.js data-depends="bootbox blockies jquery.slim i18n.js nebulas.js"></script>
+
     <!-- Front end logic for our Dapp -->
     <script>
         "use strict";
@@ -57,17 +57,24 @@ See also DecentralizedRNGContract.js
         var user_account = null;
 
         // Gas hard coded for simplicity, ideally your app would allow for changing the gas price, etc.
-        var is_mainnet = false;
-        var nebulas_chain_id, nebulas_domain; 
+        var network = 1;
+        var nebulas_chain_id, nebulas_domain;
         var gas_price = 1000000;
         var gas_limit = 200000;
 
-        if(is_mainnet) {
+        switch(network) {
+          case 1:
             nebulas_chain_id = 1;
             nebulas_domain = "https://mainnet.nebulas.io";
-        } else {
+          break;
+          case 2:
             nebulas_chain_id = 1001;
             nebulas_domain = "https://testnet.nebulas.io";
+          break;
+          case 3:
+            nebulas_chain_id = 100;
+            nebulas_domain = "http://127.0.0.1:8685";
+          break;
         }
 
         // The nebulas API, used for signing transactions, etc
@@ -101,7 +108,7 @@ See also DecentralizedRNGContract.js
                     $("#rng_request_data").text(response.data);
                     $("#rng_request_date").text(new Date(response.date));
                 }
-            });         
+            });
         }
 
         // Called by the post button
@@ -118,23 +125,23 @@ See also DecentralizedRNGContract.js
                     nonce,
                     gas_price,
                     gas_limit,
-                    {function: "requestNumber", args: JSON.stringify([$("#new_request_max").val(), $("#new_request_data").val()])}); 
+                    {function: "requestNumber", args: JSON.stringify([$("#new_request_max").val(), $("#new_request_data").val()])});
 
                 gTx.signTransaction();
                 neb.api.sendRawTransaction(gTx.toProtoString())
                 .then(function (response) {
                     window.location = location.protocol + '//' + location.host + location.pathname + '?' + response.txhash;
                 });
-            });            
+            });
         }
 
         // Called by the Nebulas library when the user selects their wallet file and enters the password.
         function onUnlockFile(swf, fileJson, account, password) {
-            account.fromKey(fileJson, password); // Load account information 
+            account.fromKey(fileJson, password); // Load account information
             user_account = account; // Save it in a global variable
 
             // Enables buttons so the user may now use the Dapp
-            $("#request_number").attr("disabled", false);                
+            $("#request_number").attr("disabled", false);
         }
 
         $("#rng_request").hide();
